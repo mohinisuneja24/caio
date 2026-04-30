@@ -1,0 +1,486 @@
+{
+  "info": {
+    "_postman_id": "ciao-delivery-api-collection",
+    "name": "Ciao Delivery API",
+    "description": "Food delivery backend — auth, restaurants, menu, orders, delivery partners.\n\n**Setup:** Run requests in **1. Auth** first (registers save JWTs to collection variables). Adjust `baseUrl` if your port differs.\n\n**Phones** must match `^[6-9]\\\\d{9}$` (10-digit Indian mobile). Default test users use 9876543210 / 9876543211 / 9876543212.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081" },
+    { "key": "tokenUser", "value": "" },
+    { "key": "tokenRestaurant", "value": "" },
+    { "key": "tokenDelivery", "value": "" },
+    { "key": "restaurantId", "value": "1" },
+    { "key": "menuItemId", "value": "1" },
+    { "key": "orderId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Register — Customer (USER)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.token) pm.collectionVariables.set('tokenUser', j.data.token);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Customer\",\n  \"phone\": \"9876543210\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "description": "If user already exists, use **Login — Customer** instead."
+          }
+        },
+        {
+          "name": "Register — Restaurant owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.token) pm.collectionVariables.set('tokenRestaurant', j.data.token);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Restaurant Owner\",\n  \"phone\": \"9876543211\",\n  \"password\": \"password123\",\n  \"role\": \"RESTAURANT\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/register"
+          }
+        },
+        {
+          "name": "Register — Delivery partner account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.token) pm.collectionVariables.set('tokenDelivery', j.data.token);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Rider\",\n  \"phone\": \"9876543212\",\n  \"password\": \"password123\",\n  \"role\": \"DELIVERY\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/register"
+          }
+        },
+        {
+          "name": "Login — Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.token) pm.collectionVariables.set('tokenUser', j.data.token);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543210\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login"
+          }
+        },
+        {
+          "name": "Login — Restaurant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.token) pm.collectionVariables.set('tokenRestaurant', j.data.token);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543211\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login"
+          }
+        },
+        {
+          "name": "Login — Delivery",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.token) pm.collectionVariables.set('tokenDelivery', j.data.token);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"9876543212\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Restaurants",
+      "item": [
+        {
+          "name": "List restaurants (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/restaurants"
+          }
+        },
+        {
+          "name": "Get restaurant by id (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}"
+          }
+        },
+        {
+          "name": "List my restaurants (owner)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }],
+            "url": "{{baseUrl}}/api/v1/restaurants/mine",
+            "description": "RESTAURANT JWT only — active venues you own."
+          }
+        },
+        {
+          "name": "Create restaurant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.id) pm.collectionVariables.set('restaurantId', String(j.data.id));",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Spice Hub\",\n  \"location\": \"MG Road, City\",\n  \"openTime\": \"10:00:00\",\n  \"closeTime\": \"22:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/restaurants",
+            "description": "Requires RESTAURANT JWT. Saves `restaurantId` from response."
+          }
+        },
+        {
+          "name": "Update restaurant",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Spice Hub Updated\",\n  \"location\": \"MG Road, City\",\n  \"openTime\": \"09:00:00\",\n  \"closeTime\": \"23:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}"
+          }
+        },
+        {
+          "name": "Deactivate restaurant",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }],
+            "url": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}",
+            "description": "Soft-deactivates; use a new id or re-register flow if you need a fresh restaurant."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Menu",
+      "item": [
+        {
+          "name": "Get menu (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}/menu"
+          }
+        },
+        {
+          "name": "Add menu item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.id) pm.collectionVariables.set('menuItemId', String(j.data.id));",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Paneer Tikka\",\n  \"description\": \"Grilled cottage cheese\",\n  \"price\": 249.00\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}/menu"
+          }
+        },
+        {
+          "name": "Update menu item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Paneer Tikka (Large)\",\n  \"description\": \"Grilled cottage cheese\",\n  \"price\": 299.00\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}/menu/{{menuItemId}}"
+          }
+        },
+        {
+          "name": "Toggle menu item availability",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }],
+            "url": "{{baseUrl}}/api/v1/restaurants/{{restaurantId}}/menu/{{menuItemId}}/toggle"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Delivery partners",
+      "item": [
+        {
+          "name": "Register delivery profile (hours)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenDelivery}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availableFrom\": \"17:00:00\",\n  \"availableTo\": \"21:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/delivery-partners/register",
+            "description": "One-time per user. `availableFrom` must be before `availableTo`."
+          }
+        },
+        {
+          "name": "Get my delivery profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenDelivery}}" }],
+            "url": "{{baseUrl}}/api/v1/delivery-partners/me"
+          }
+        },
+        {
+          "name": "Update availability window",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenDelivery}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availableFrom\": \"16:00:00\",\n  \"availableTo\": \"22:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/delivery-partners/availability"
+          }
+        },
+        {
+          "name": "Toggle on duty",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenDelivery}}" }],
+            "url": "{{baseUrl}}/api/v1/delivery-partners/duty",
+            "description": "Must be on duty AND current time within window to appear in **List available partners**."
+          }
+        },
+        {
+          "name": "List available partners (now)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }],
+            "url": "{{baseUrl}}/api/v1/delivery-partners/available",
+            "description": "RESTAURANT or DELIVERY JWT. Partners must be on duty and current time between availableFrom and availableTo."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Orders",
+      "item": [
+        {
+          "name": "Place order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.data && j.data.id) pm.collectionVariables.set('orderId', String(j.data.id));",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurantId\": {{restaurantId}},\n  \"menuItemIds\": [{{menuItemId}}],\n  \"deliveryAddress\": \"221B Baker Street\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/orders",
+            "description": "Restaurant must be **open** (current time between openTime and closeTime). Edit `menuItemIds` array if multiple items."
+          }
+        },
+        {
+          "name": "My orders",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": "{{baseUrl}}/api/v1/orders/my"
+          }
+        },
+        {
+          "name": "Get order by id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}",
+            "description": "Customer, restaurant owner, or assigned partner can access."
+          }
+        },
+        {
+          "name": "Orders for my restaurant",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }],
+            "url": "{{baseUrl}}/api/v1/orders/restaurant/{{restaurantId}}"
+          }
+        },
+        {
+          "name": "Accept order (assigns partner if available)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }],
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/accept"
+          }
+        },
+        {
+          "name": "Update status → OUT_FOR_DELIVERY",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenRestaurant}}" }],
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/status?status=OUT_FOR_DELIVERY",
+            "description": "Restaurant or Delivery role; order must be ACCEPTED."
+          }
+        },
+        {
+          "name": "Update status → DELIVERED",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenDelivery}}" }],
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/status?status=DELIVERED",
+            "description": "Only assigned delivery partner; order must be OUT_FOR_DELIVERY."
+          }
+        },
+        {
+          "name": "Cancel order",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": "{{baseUrl}}/api/v1/orders/{{orderId}}/cancel"
+          }
+        }
+      ]
+    }
+  ]
+}

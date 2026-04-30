@@ -1,0 +1,11 @@
+# Flutter
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/GeneratedPluginRegistrant.java
+**/GeneratedPluginRegistrant.swift
+*.iml
+.idea/
+local.properties
