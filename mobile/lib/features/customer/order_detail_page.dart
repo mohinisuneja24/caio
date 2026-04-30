@@ -4,6 +4,7 @@ import 'package:ciao_delivery/features/customer/customer_providers.dart';
 import 'package:ciao_delivery/providers/repositories_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class OrderDetailPage extends ConsumerWidget {
   const OrderDetailPage({super.key, required this.orderId});
@@ -14,7 +15,14 @@ class OrderDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(orderByIdProvider(orderId));
     return Scaffold(
-      appBar: AppBar(title: Text('Order #$orderId')),
+      appBar: AppBar(
+        title: Text('Order #$orderId'),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: 'Close',
+          onPressed: () => context.go('/customer'),
+        ),
+      ),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator.adaptive()),
         error: (e, _) => Center(child: Padding(
@@ -75,6 +83,25 @@ class OrderDetailPage extends ConsumerWidget {
                   },
                   child: const Text('Cancel order'),
                 ),
+              const SizedBox(height: 28),
+              Text('What next?', style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: () => context.go('/customer'),
+                icon: const Icon(Icons.restaurant_rounded),
+                label: const Text('Browse restaurants'),
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () {
+                  context.go('/customer');
+                  Future.microtask(() {
+                    ref.read(customerPendingTabProvider.notifier).state = 1;
+                  });
+                },
+                icon: const Icon(Icons.receipt_long_outlined),
+                label: const Text('View my orders'),
+              ),
             ],
           ),
         ),

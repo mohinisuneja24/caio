@@ -43,6 +43,24 @@ abstract final class AppTheme {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        elevation: 0,
+        indicatorColor: scheme.primaryContainer,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              color: scheme.primary,
+            );
+          }
+          return TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+            color: scheme.onSurfaceVariant,
+          );
+        }),
+      ),
     );
   }
 }

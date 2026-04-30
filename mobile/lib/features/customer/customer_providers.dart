@@ -37,3 +37,7 @@ final restaurantOrdersProvider =
 final deliveryProfileProvider = FutureProvider.autoDispose((ref) {
   return ref.watch(deliveryRepositoryProvider).me();
 });
+
+/// Set to `0`–`2` (Explore / Orders / Settings) right before `context.go('/customer')`
+/// so [CustomerHomePage] opens on that tab once.
+final customerPendingTabProvider = StateProvider<int?>((ref) => null);

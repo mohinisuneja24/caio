@@ -19,8 +19,14 @@ class _CustomerHomePageState extends ConsumerState<CustomerHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int?>(customerPendingTabProvider, (_, next) {
+      if (next != null && mounted) {
+        setState(() => _index = next.clamp(0, 2));
+        ref.read(customerPendingTabProvider.notifier).state = null;
+      }
+    });
+
     final cartCount = ref.watch(cartProvider).items.length;
-    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -49,20 +55,20 @@ class _CustomerHomePageState extends ConsumerState<CustomerHomePage> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: [
+        destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.restaurant_outlined, color: scheme.onSurfaceVariant),
-            selectedIcon: Icon(Icons.restaurant, color: scheme.primary),
+            icon: Icon(Icons.restaurant_outlined),
+            selectedIcon: Icon(Icons.restaurant_rounded),
             label: 'Explore',
           ),
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined, color: scheme.onSurfaceVariant),
-            selectedIcon: Icon(Icons.receipt_long, color: scheme.primary),
+            icon: Icon(Icons.receipt_long_outlined),
+            selectedIcon: Icon(Icons.receipt_long_rounded),
             label: 'Orders',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined, color: scheme.onSurfaceVariant),
-            selectedIcon: Icon(Icons.settings, color: scheme.primary),
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded),
             label: 'Settings',
           ),
         ],
