@@ -40,7 +40,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ref.invalidate(restaurantsListProvider);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Base URL saved. Pull to refresh on Explore.')),
+        const SnackBar(content: Text('Base URL saved. Pull to refresh on Discover.')),
       );
     }
   }

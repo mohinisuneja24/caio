@@ -25,7 +25,7 @@ class _CartPageState extends ConsumerState<CartPage> {
 
   Future<void> _checkout() async {
     final cart = ref.read(cartProvider);
-    if (cart.restaurantId == null || cart.items.isEmpty) {
+    if (cart.restaurantId == null || cart.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cart is empty')),
       );
@@ -58,10 +58,10 @@ class _CartPageState extends ConsumerState<CartPage> {
       appBar: AppBar(title: const Text('Your cart')),
       body: SafeArea(
         child: ResponsiveBody(
-          child: cart.items.isEmpty
+          child: cart.isEmpty
               ? Center(
                   child: Text(
-                    'Nothing here yet.\nBrowse restaurants and tap items to add.',
+                    'Nothing here yet.\nBrowse restaurants and add dishes from the menu.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
@@ -77,18 +77,63 @@ class _CartPageState extends ConsumerState<CartPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ...List.generate(cart.items.length, (i) {
-                      final it = cart.items[i];
+                    Text(
+                      'Your order',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    ...List.generate(cart.lines.length, (i) {
+                      final line = cart.lines[i];
+                      final it = line.item;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Card(
-                          child: ListTile(
-                            title: Text(it.name),
-                            subtitle: Text('₹${it.price.toStringAsFixed(2)}'),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              onPressed: () =>
-                                  ref.read(cartProvider.notifier).removeAt(i),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Text(it.name),
+                                    subtitle: Text(
+                                      '₹${it.price.toStringAsFixed(0)} each',
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      onPressed: line.quantity > 1
+                                          ? () => ref
+                                              .read(cartProvider.notifier)
+                                              .setLineQuantity(i, line.quantity - 1)
+                                          : () =>
+                                              ref.read(cartProvider.notifier).removeLine(i),
+                                      icon: Icon(
+                                        line.quantity > 1
+                                            ? Icons.remove_rounded
+                                            : Icons.delete_outline_rounded,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 28,
+                                      child: Text(
+                                        '${line.quantity}',
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () => ref
+                                          .read(cartProvider.notifier)
+                                          .setLineQuantity(i, line.quantity + 1),
+                                      icon: const Icon(Icons.add_rounded),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -98,12 +143,19 @@ class _CartPageState extends ConsumerState<CartPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Total', style: Theme.of(context).textTheme.titleMedium),
+                        Text('Subtotal', style: Theme.of(context).textTheme.titleMedium),
                         Text(
                           '₹${cart.subtotal.toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${cart.itemCount} ${cart.itemCount == 1 ? 'item' : 'items'}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
                     const SizedBox(height: 20),
                     FilledButton(

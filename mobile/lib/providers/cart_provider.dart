@@ -5,23 +5,44 @@ class CartRestaurantConflictException implements Exception {
   const CartRestaurantConflictException();
 }
 
+class CartLine {
+  const CartLine({required this.item, this.quantity = 1});
+
+  final MenuItem item;
+  final int quantity;
+
+  double get lineTotal => item.price * quantity;
+
+  CartLine copyWith({MenuItem? item, int? quantity}) {
+    return CartLine(
+      item: item ?? this.item,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+}
+
 class CartState {
-  const CartState({this.restaurantId, this.items = const []});
+  const CartState({this.restaurantId, this.lines = const []});
 
   final int? restaurantId;
-  final List<MenuItem> items;
+  final List<CartLine> lines;
 
-  double get subtotal => items.fold(0, (a, b) => a + b.price);
+  double get subtotal => lines.fold(0, (a, b) => a + b.lineTotal);
+
+  /// Total units (for badges).
+  int get itemCount => lines.fold(0, (a, l) => a + l.quantity);
+
+  bool get isEmpty => lines.isEmpty;
 
   CartState copyWith({
     int? restaurantId,
-    List<MenuItem>? items,
+    List<CartLine>? lines,
     bool clear = false,
   }) {
     if (clear) return const CartState();
     return CartState(
       restaurantId: restaurantId ?? this.restaurantId,
-      items: items ?? this.items,
+      lines: lines ?? this.lines,
     );
   }
 }
@@ -29,28 +50,48 @@ class CartState {
 class CartNotifier extends StateNotifier<CartState> {
   CartNotifier() : super(const CartState());
 
-  void addItem(MenuItem item) {
+  /// Expands quantities into repeated IDs for the place-order API.
+  List<int> get menuItemIds =>
+      lines.expand((l) => List<int>.filled(l.quantity, l.item.id)).toList();
+
+  void addItem(MenuItem item, {int quantity = 1}) {
+    if (quantity < 1) return;
     if (state.restaurantId != null && state.restaurantId != item.restaurantId) {
       throw const CartRestaurantConflictException();
     }
-    final next = [...state.items, item];
-    state = CartState(restaurantId: item.restaurantId, items: next);
+    final idx = state.lines.indexWhere((l) => l.item.id == item.id);
+    final next = [...state.lines];
+    if (idx >= 0) {
+      final line = next[idx];
+      next[idx] = line.copyWith(quantity: line.quantity + quantity);
+    } else {
+      next.add(CartLine(item: item, quantity: quantity));
+    }
+    state = CartState(restaurantId: item.restaurantId, lines: next);
   }
 
-  void removeAt(int index) {
-    final next = [...state.items]..removeAt(index);
+  void setLineQuantity(int index, int quantity) {
+    if (quantity < 1) {
+      removeLine(index);
+      return;
+    }
+    final next = [...state.lines];
+    next[index] = next[index].copyWith(quantity: quantity);
+    state = CartState(restaurantId: state.restaurantId, lines: next);
+  }
+
+  void removeLine(int index) {
+    final next = [...state.lines]..removeAt(index);
     if (next.isEmpty) {
       state = const CartState();
     } else {
-      state = CartState(restaurantId: state.restaurantId, items: next);
+      state = CartState(restaurantId: state.restaurantId, lines: next);
     }
   }
 
   void clear() {
     state = const CartState();
   }
-
-  List<int> get menuItemIds => state.items.map((e) => e.id).toList();
 }
 
 final cartProvider = StateNotifierProvider<CartNotifier, CartState>((ref) {
