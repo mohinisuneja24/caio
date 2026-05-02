@@ -165,17 +165,17 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
                               tooltip: 'Sort',
                               onSelected: (m) => setState(() => _sortMode = m),
                               itemBuilder: (context) => [
-                                PopupMenuItem(
+                                CheckedPopupMenuItem(
                                   value: _SortMode.smart,
                                   checked: _sortMode == _SortMode.smart,
                                   child: const Text('Recommended (open first)'),
                                 ),
-                                PopupMenuItem(
+                                CheckedPopupMenuItem(
                                   value: _SortMode.nameAsc,
                                   checked: _sortMode == _SortMode.nameAsc,
                                   child: const Text('Name A–Z'),
                                 ),
-                                PopupMenuItem(
+                                CheckedPopupMenuItem(
                                   value: _SortMode.nameDesc,
                                   checked: _sortMode == _SortMode.nameDesc,
                                   child: const Text('Name Z–A'),
