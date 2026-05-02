@@ -51,8 +51,9 @@ class CartNotifier extends StateNotifier<CartState> {
   CartNotifier() : super(const CartState());
 
   /// Expands quantities into repeated IDs for the place-order API.
-  List<int> get menuItemIds =>
-      lines.expand((l) => List<int>.filled(l.quantity, l.item.id)).toList();
+  List<int> get menuItemIds => state.lines
+      .expand((l) => List<int>.filled(l.quantity, l.item.id))
+      .toList();
 
   void addItem(MenuItem item, {int quantity = 1}) {
     if (quantity < 1) return;
